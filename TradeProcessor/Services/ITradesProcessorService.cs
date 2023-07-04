@@ -8,6 +8,6 @@ namespace TradeProcessor.Services
 {
     internal interface ITradesProcessorService
     {
-        void ProcessTrades();
+        Task ProcessTrades();
     }
 }

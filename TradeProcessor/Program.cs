@@ -5,6 +5,7 @@ using TradeProcessor;
 using Microsoft.Extensions.Configuration;
 using TradeProcessor.Repositories;
 using TradeProcessor.Services;
+using Microsoft.ApplicationInsights.WorkerService;
 
 // Application code should start here.
 
@@ -13,28 +14,27 @@ BuildApp();
 
 void BuildApp()
 {
-    // Create service collection and configure our services
-    var services = ConfigureServices();
-    // Generate a provider
-    var serviceProvider = services.BuildServiceProvider();
+    // Create application and configure services
+    HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+    var app = ConfigureServices(builder);
 
     // Run the code
-    serviceProvider.GetService<TradeProcessorApplication>().Run();
+    IHost host = builder.Build();
+    host.Run();
 }
 
-static IServiceCollection ConfigureServices()
+static HostApplicationBuilder ConfigureServices(HostApplicationBuilder builder)
 {
-    IServiceCollection services = new ServiceCollection();
-    // Set up the objects we need to get to configuration settings
+    // Set up the objects to get to configuration settings
     var config = LoadConfiguration();
-    // Add the config to our DI container for later use
-    services.AddSingleton(config);
-    services.AddTransient<ITradesReader, TradesReader>();
-    services.AddTransient<ITradesRepository, TradesRepository>();
-    services.AddTransient<ITradesProcessorService, TradesProcessorService>();
+    // Add the config to DI container for later use
+    builder.Services.AddSingleton(config);
+    builder.Services.AddTransient<ITradesReader, TradesReader>();
+    builder.Services.AddTransient<ITradesRepository, TradesRepository>();
+    builder.Services.AddTransient<ITradesProcessorService, TradesProcessorService>();
     // Register our application entry point
-    services.AddTransient<TradeProcessorApplication>();
-    return services;
+    builder.Services.AddHostedService<TradeProcessorApplication>();
+    return builder;
 }
 
 static IConfiguration LoadConfiguration()

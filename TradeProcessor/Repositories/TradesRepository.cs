@@ -9,12 +9,12 @@ namespace TradeProcessor.Repositories
 {
     public class TradesRepository : ITradesRepository
     {
-        public void SaveData(IEnumerable<Trade> trades)
+        public Task SaveData(IEnumerable<Trade> trades)
         {
             throw new NotImplementedException();
         }
 
-        public void TruncateData()
+        public Task TruncateData()
         {
             throw new NotImplementedException();
         }

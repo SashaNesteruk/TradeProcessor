@@ -18,13 +18,13 @@ namespace TradeProcessor.Services
             _tradesRepository = tradesRepository;
         }
 
-        public void ProcessTrades()
+        public async Task ProcessTrades()
         {
             IEnumerable<Trade> trades = _tradesReader.ReadTrades();
 
             if (trades.Count() > 0) {
-                _tradesRepository.TruncateData();
-                _tradesRepository.SaveData(trades);
+                await _tradesRepository.TruncateData();
+                await _tradesRepository.SaveData(trades);
 
                 _tradesReader.ArchiveTrades();
             }

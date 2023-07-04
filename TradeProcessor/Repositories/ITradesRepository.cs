@@ -9,7 +9,7 @@ namespace TradeProcessor.Repositories
 {
     public interface ITradesRepository
     {
-        void TruncateData();
-        void SaveData(IEnumerable<Trade> trades);
+        Task TruncateData();
+        Task SaveData(IEnumerable<Trade> trades);
     }
 }
