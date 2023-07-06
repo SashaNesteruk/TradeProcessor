@@ -29,8 +29,12 @@ void BuildApp()
         .ReadFrom.Configuration(app.Configuration)
         .Enrich.FromLogContext()
         .CreateLogger();
+
     builder.Logging.ClearProviders();
     builder.Logging.AddSerilog(logger);
+
+    app.Logging.ClearProviders();
+    app.Logging.AddSerilog(logger);
 
     // Run the code
     IHost host = builder.Build();
