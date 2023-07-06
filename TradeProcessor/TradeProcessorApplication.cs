@@ -12,9 +12,9 @@ namespace TradeProcessor
     {
         ITradesProcessorService _tradesProcessorService;
 
-        public TradeProcessorApplication()
+        public TradeProcessorApplication(ITradesProcessorService tradesProcessorService)
         {
-
+            _tradesProcessorService = tradesProcessorService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

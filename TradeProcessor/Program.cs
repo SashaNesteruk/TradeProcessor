@@ -5,18 +5,32 @@ using TradeProcessor;
 using Microsoft.Extensions.Configuration;
 using TradeProcessor.Repositories;
 using TradeProcessor.Services;
-using Microsoft.ApplicationInsights.WorkerService;
+using TradeProcessor.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
+using Serilog;
+using Microsoft.Extensions.Logging;
 
-// Application code should start here.
+// Application code entry point
+Log.Logger = new LoggerConfiguration()
+    .CreateLogger();
 
-Console.WriteLine("Starting application");
+Log.Information("Starting application");
 BuildApp();
 
 void BuildApp()
 {
     // Create application and configure services
-    HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+    var builder = Host.CreateApplicationBuilder(args);
     var app = ConfigureServices(builder);
+
+    // Configure Logger
+    var logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(app.Configuration)
+        .Enrich.FromLogContext()
+        .CreateLogger();
+    builder.Logging.ClearProviders();
+    builder.Logging.AddSerilog(logger);
 
     // Run the code
     IHost host = builder.Build();
@@ -32,7 +46,12 @@ static HostApplicationBuilder ConfigureServices(HostApplicationBuilder builder)
     builder.Services.AddTransient<ITradesReader, TradesReader>();
     builder.Services.AddTransient<ITradesRepository, TradesRepository>();
     builder.Services.AddTransient<ITradesProcessorService, TradesProcessorService>();
-    // Register our application entry point
+
+    // Add Context
+    builder.Services.AddDbContext<TradesContext>
+   (opts => opts.UseSqlite(config.GetConnectionString("Trades_db")));
+
+    // Register application entry point
     builder.Services.AddHostedService<TradeProcessorApplication>();
     return builder;
 }

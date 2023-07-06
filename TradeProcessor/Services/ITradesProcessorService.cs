@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TradeProcessor.Services
 {
-    internal interface ITradesProcessorService
+    public interface ITradesProcessorService
     {
         Task ProcessTrades();
     }

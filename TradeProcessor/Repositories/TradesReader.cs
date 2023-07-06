@@ -2,8 +2,10 @@
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Formats.Asn1;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using TradeProcessor.Models;
 
 namespace TradeProcessor.Repositories
@@ -17,8 +19,10 @@ namespace TradeProcessor.Repositories
             _configuration = configuration;
             _csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                Encoding = Encoding.UTF8, // Our file uses UTF-8 encoding.
-                Delimiter = "," // The delimiter is a comma.
+                Encoding = Encoding.UTF8,
+                Delimiter = ",",
+                HasHeaderRecord = true,
+                PrepareHeaderForMatch = header => Regex.Replace(header.Header, @"[\s-]+", string.Empty).ToLower()
             };
         }
         public IEnumerable<Trade> ReadTrades()
@@ -46,7 +50,23 @@ namespace TradeProcessor.Repositories
 
         public void ArchiveTrades()
         {
-            throw new NotImplementedException();
+            var sourcePath = _configuration.GetValue<string>("UploadLocation");
+            var destPath = _configuration.GetValue<string>("ArchiveLocation");
+            if (Directory.Exists(sourcePath))
+            {
+                foreach (var file in new DirectoryInfo(sourcePath).GetFiles())
+                {
+                    if (!Directory.Exists(destPath)) {
+                        Directory.CreateDirectory(destPath);
+                    }
+
+                    if (File.Exists(destPath+file.Name))
+                    {
+                        File.Delete(destPath + file.Name);
+                    }
+                    File.Move(sourcePath + file.Name, destPath + file.Name);
+                }
+            }
         }
     }
 }
