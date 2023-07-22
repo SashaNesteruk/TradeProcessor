@@ -10,7 +10,7 @@ using TradeProcessor.Models;
 
 namespace TradeProcessor.Repositories
 {
-    internal class TradesReader : ITradesReader
+    public class TradesReader : ITradesReader
     {
         private readonly IConfiguration _configuration;
         private readonly CsvConfiguration _csvConfiguration;
@@ -34,14 +34,20 @@ namespace TradeProcessor.Repositories
                 string[] fileNames = Directory.GetFiles(path, "*.csv");
                 foreach (string fileName in fileNames)
                 {
-                    using (var fs = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    try 
                     {
-                        using (var textReader = new StreamReader(fs, Encoding.UTF8))
-                        using (var csv = new CsvReader(textReader, _csvConfiguration))
+                        using (var fs = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
-                            trades.AddRange(csv.GetRecords<Trade>());
+                            using (var textReader = new StreamReader(fs, Encoding.UTF8))
+                            using (var csv = new CsvReader(textReader, _csvConfiguration))
+                            {
+                                trades.AddRange(csv.GetRecords<Trade>());
+                            }
                         }
+                    } catch (CsvHelper.ValidationException e) {
+                        return trades;
                     }
+                    
                 }
             }
 
@@ -60,11 +66,11 @@ namespace TradeProcessor.Repositories
                         Directory.CreateDirectory(destPath);
                     }
 
-                    if (File.Exists(destPath+file.Name))
+                    if (File.Exists(destPath + "/" + file.Name))
                     {
-                        File.Delete(destPath + file.Name);
+                        File.Delete(destPath + "/" + file.Name);
                     }
-                    File.Move(sourcePath + file.Name, destPath + file.Name);
+                    File.Move(sourcePath + "/" + file.Name, destPath + "/" + file.Name);
                 }
             }
         }

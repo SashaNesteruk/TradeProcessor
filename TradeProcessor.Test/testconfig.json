@@ -1,0 +1,6 @@
+{
+    "UploadLocation": "./IntegrationTests/TestFiles/ProcessFiles",
+    "InputLocation": "./IntegrationTests/TestFiles/InputFiles",
+    "CorruptLocation": "./IntegrationTests/TestFiles/CorruptFiles",
+    "ArchiveLocation": "./IntegrationTests/TestFiles/Archive"
+}
