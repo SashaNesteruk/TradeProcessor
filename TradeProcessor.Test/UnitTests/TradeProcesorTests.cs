@@ -6,7 +6,7 @@ using TradeProcessor.Repositories;
 using TradeProcessor.Services;
 using Xunit;
 
-namespace TradeProcessor.Test
+namespace TradeProcessor.Test.UnitTests
 {
     public class TradeProcesorTests
     {
